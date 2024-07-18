@@ -5,6 +5,9 @@ let currentWeapon = 0;
 let fighting;
 let monsterHealth;
 let inventory = ["stick"];
+let fireBall = 0;
+let answer = 0; // for the two functions that needed them. 
+
 
 const button1 = document.querySelector('#button1');
 const button2 = document.querySelector("#button2");
@@ -13,6 +16,8 @@ const text = document.querySelector("#text");
 const xpText = document.querySelector("#xpText");
 const healthText = document.querySelector("#healthText");
 const goldText = document.querySelector("#goldText");
+goldText.innerText = gold; // Wanted both texts to show at all times really
+healthText.innerText = health;
 const monsterStats = document.querySelector("#monsterStats");
 const monsterName = document.querySelector("#monsterName");
 const monsterHealthText = document.querySelector("#monsterHealth");
@@ -20,72 +25,84 @@ const weapons = [
   { name: 'stick', power: 5 },
   { name: 'dagger', power: 30 },
   { name: 'claw hammer', power: 50 },
-  { name: 'sword', power: 100 }
+  { name: 'sword', power: 100 },
+  { name: 'great sword', power: 200},
+  { name: 'great war hammer', power: 300} // add more weapons to fight the big dragon
 ];
 const monsters = [
   {
-    name: "slime",
+    name: "Slime",
     level: 2,
-    health: 15
+    health: 30
   },
   {
-    name: "fanged beast",
-    level: 8,
-    health: 60
+    name: "Goblin", //Added a goblin to fight in the middle of the slime and fanged beast //
+    level: 5,
+    health: 50
   },
   {
-    name: "dragon",
+    name: "Fanged Beast",
+    level: 10,
+    health: 80
+  },
+  {
+    name: "Baby Dragon",
     level: 20,
-    health: 300
+    health: 500
+  },
+  {
+    name: "Mother Dragon", //Added a harder dragon and upped the health and level //
+    level: 40,
+    health: 2000
   }
 ]
 const locations = [
   {
     name: "town square",
-    "button text": ["Go to store", "Go to cave", "Fight dragon"],
-    "button functions": [goStore, goCave, fightDragon],
+    "button text": ["Go to store", "Go to cave", "Fight baby dragon", "Fight Mother Dragon", "Pay to win"], //ADDED
+    "button functions": [goStore, goCave, fightDragon, fightMotherDragon, payToWin],
     text: "You are in the town square. You see a sign that says \"Store\"."
   },
   {
     name: "store",
-    "button text": ["Buy 10 health (10 gold)", "Buy weapon (30 gold)", "Go to town square"],
-    "button functions": [buyHealth, buyWeapon, goTown],
+    "button text": ["Buy 10 health (20 gold)", "Buy weapon (50 gold)", "Buy fireball(100 gold)", "Go to town square", "Pay to win"], // add more items to the store to do better things (1 special item)
+    "button functions": [buyHealth, buyWeapon, buyFireball, goTown, payToWin],
     text: "You enter the store."
   },
   {
     name: "cave",
-    "button text": ["Fight slime", "Fight fanged beast", "Go to town square"],
-    "button functions": [fightSlime, fightBeast, goTown],
+    "button text": ["Fight Slime", "Fight Goblin", "Fight Fanged Beast", "Go to town square", "Pay to win"], // Finish functions for the locations and pay to win
+    "button functions": [fightSlime, fightGoblin, fightBeast, goTown, payToWin],
     text: "You enter the cave. You see some monsters."
   },
   {
     name: "fight",
-    "button text": ["Attack", "Dodge", "Run"],
-    "button functions": [attack, dodge, goTown],
+    "button text": ["Attack", "Dodge", "Run", "Use Fireball", "Pay to Win"],
+    "button functions": [attack, dodge, goTown, castFireball, payToWin], // add some more fighting features like fireball spell? Drink a healing pot or so
     text: "You are fighting a monster."
   },
   {
     name: "kill monster",
-    "button text": ["Go to town square", "Go to town square", "Go to town square"],
-    "button functions": [goTown, goTown, easterEgg],
+    "button text": ["Go to town square", "Go to town square", "Go to town square", "Go back to the town now!", "Hurry up!"],
+    "button functions": [goTown, goTown, easterEgg, goTown, goTown], // need some more time to think about this 
     text: 'The monster screams "Arg!" as it dies. You gain experience points and find gold.'
   },
   {
     name: "lose",
-    "button text": ["REPLAY?", "REPLAY?", "REPLAY?"],
-    "button functions": [restart, restart, restart],
+    "button text": ["REPLAY?", "REPLAY?", "REPLAY?" ,"You suck", "By the way"],
+    "button functions": [restart, restart, restart, restart, restart], // Added some quotes
     text: "You die. &#x2620;"
   },
   { 
     name: "win", 
-    "button text": ["REPLAY?", "REPLAY?", "REPLAY?"], 
-    "button functions": [restart, restart, restart], 
+    "button text": ["REPLAY?", "REPLAY?", "REPLAY?", "You're a legend", "All hail the dragon Killer!"], 
+    "button functions": [restart, restart, restart, restart, restart], // Added some hurrays
     text: "You defeat the dragon! YOU WIN THE GAME! &#x1F389;" 
   },
   {
     name: "easter egg",
-    "button text": ["2", "8", "Go to town square?"],
-    "button functions": [pickTwo, pickEight, goTown],
+    "button text": ["2", "8", "Go to town square?", "Double or nothing? (2)", "Double or nothing? (8)"],
+    "button functions": [pickTwo, pickEight, goTown, pickTwoDouble, pickEightDouble], //Added some extra modes to chose 
     text: "You find a secret game. Pick a number above. Ten numbers will be randomly chosen between 0 and 10. If the number you choose matches one of the random numbers, you win!"
   }
 ];
@@ -94,24 +111,68 @@ const locations = [
 button1.onclick = goStore;
 button2.onclick = goCave;
 button3.onclick = fightDragon;
+button4.onclick = fightMotherDragon;
+button5.onclick = payToWin; //ADDED
 
 function update(location) {
   monsterStats.style.display = "none";
   button1.innerText = location["button text"][0];
   button2.innerText = location["button text"][1];
   button3.innerText = location["button text"][2];
+  button4.innerText = location["button text"][3];
+  button5.innerText = location["button text"][4];
   button1.onclick = location["button functions"][0];
-  button2.onclick = location["button functions"][1];
+  button2.onclick = location["button functions"][1]; // ADDED buttons and text that was needed 
   button3.onclick = location["button functions"][2];
+  button4.onclick = location["button functions"][3];
+  button5.onclick = location["button functions"][4];
   text.innerHTML = location.text;
 }
 
+//IMAGES FOR EACH LOCATION//
+function setImage(imageSrc) {
+const imgBackDiv = document.querySelector('.imgBack');
+
+imgBackDiv.innerHTML = " "; 
+
+const img = document.createElement('img');
+img.src = imageSrc;
+imgBackDiv.appendChild(img);
+}
+
+function imgTown() {
+  setImage('Test image.png');
+}
+function  imgCave() {
+  setImage('');
+}
+function imgStore() {
+  setImage('');
+}
+function imgLose() {
+  setImage('');
+}
+function imgWin() {
+  setImage('');
+}
+function imgCreature() {
+  setImage('');
+}
+function imgCreatureDead() {
+  setImage('');
+}
+function imgEaster() {
+  setImage('');
+}
+
+
 function goTown() {
   update(locations[0]);
+  imgTown();
 }
 
 function goStore() {
-  update(locations[1]);
+  update(locations[1]); //Get from place to place
 }
 
 function goCave() {
@@ -119,10 +180,10 @@ function goCave() {
 }
 
 function buyHealth() {
-  if (gold >= 10) {
-    gold -= 10;
-    health += 10;
-    goldText.innerText = gold;
+  if (gold >= 20) {
+    gold -= 20;
+    health += 25;
+    goldText.innerText = gold; //changed a few variables 
     healthText.innerText = health;
   } else {
     text.innerText = "You do not have enough gold to buy health.";
@@ -131,8 +192,8 @@ function buyHealth() {
 
 function buyWeapon() {
   if (currentWeapon < weapons.length - 1) {
-    if (gold >= 30) {
-      gold -= 30;
+    if (gold >= 50) {
+      gold -= 50;
       currentWeapon++;
       goldText.innerText = gold;
       let newWeapon = weapons[currentWeapon].name;
@@ -141,17 +202,17 @@ function buyWeapon() {
       text.innerText += " In your inventory you have: " + inventory;
     } else {
       text.innerText = "You do not have enough gold to buy a weapon.";
-    }
+    } // added some text changed also 
   } else {
     text.innerText = "You already have the most powerful weapon!";
-    button2.innerText = "Sell weapon for 15 gold";
+    button2.innerText = "Sell weapon for 25 gold";
     button2.onclick = sellWeapon;
   }
 }
 
 function sellWeapon() {
   if (inventory.length > 1) {
-    gold += 15;
+    gold += 25;
     goldText.innerText = gold;
     let currentWeapon = inventory.shift();
     text.innerText = "You sold a " + currentWeapon + ".";
@@ -161,18 +222,43 @@ function sellWeapon() {
   }
 }
 
-function fightSlime() {
+function buyFireball() {
+  if (fireBall < 3) {
+    if (gold >= 100) {
+      gold -= 100;
+      goldText.innerText = gold;
+      fireBall ++; //for the firescolls limit. 
+      console.log(fireBall)
+    }
+
+  } else {
+    text.innerText = "You do not have enough gold to purchase this scroll!";
+    text.innerText = "You can only hold " + fireBall + " scrolls."
+  }
+}
+
+function fightSlime() { 
   fighting = 0;
   goFight();
 }
 
-function fightBeast() {
+function fightGoblin() {
   fighting = 1;
   goFight();
 }
 
-function fightDragon() {
+function fightBeast() {
   fighting = 2;
+  goFight();
+}   //assigned to the right monsters and text and functions 
+
+function fightDragon() {
+  fighting = 3;
+  goFight();
+}
+
+function fightMotherDragon() {
+  fighting = 4;
   goFight();
 }
 
@@ -198,7 +284,7 @@ function attack() {
   if (health <= 0) {
     lose();
   } else if (monsterHealth <= 0) {
-    if (fighting === 2) {
+    if (fighting === 4) {
       winGame();
     } else {
       defeatMonster();
@@ -207,6 +293,38 @@ function attack() {
   if (Math.random() <= .1 && inventory.length !== 1) {
     text.innerText += " Your " + inventory.pop() + " breaks.";
     currentWeapon--;
+  }
+}
+
+function castFireball() {
+  if (fireBall > 0) {
+  text.innerText = "The " + monsters[fighting].name + " attacks.";
+  text.innerText += " You attack using your fire spell dealing massive damage!"
+  fireBall --; 
+  health -= getMonsterAttackValue(monsters[fighting].level);
+
+  if (isMonsterHit()) {
+    monsterHealth -= 100;
+    monsterHealthText.innerText = monsterHealth;
+  } else {
+    text.innerText = "You missed."
+  }                                                                           //Made a whole new fucntion just to do 100dmg flat, nice. 
+  
+  if (health <= 0) {
+    lose();
+
+  } else if (monsterHealth <= 0) {
+
+    if (fighting === 4) {
+      winGame();
+    } 
+    else {
+    defeatMonster();
+    }
+  }
+
+  } else {
+  text.innerText = "You do not have any Fireball scrolls!"
   }
 }
 
@@ -225,7 +343,7 @@ function dodge() {
 }
 
 function defeatMonster() {
-  gold += Math.floor(monsters[fighting].level * 6.7);
+  gold += Math.floor(monsters[fighting].level * 3);
   xp += monsters[fighting].level;
   goldText.innerText = gold;
   xpText.innerText = xp;
@@ -252,6 +370,15 @@ function restart() {
   goTown();
 }
 
+function payToWin() {
+ if (gold >= 5000) {
+  update(locations[6]);
+ } else {
+  text.innerText = "You do not have enough gold!"; //Works for those losersssss
+ }
+  console.log(payToWin)
+}
+
 function easterEgg() {
   update(locations[7]);
 }
@@ -274,15 +401,52 @@ function pick(guess) {
     text.innerText += numbers[i] + "\n";
   }
   if (numbers.includes(guess)) {
-    text.innerText += "Right! You win 20 gold!";
-    gold += 20;
+    text.innerText += "Right! You win 50 gold!";
+    gold += 50;
     goldText.innerText = gold;
   } else {
-    text.innerText += "Wrong! You lose 10 health!";
-    health -= 10;
+    text.innerText += "Wrong! You lose 20 health!"; //applied my answer solution here also 
+    health -= 20;
     healthText.innerText = health;
+    if (answer > 2) {
+      goTown();}
     if (health <= 0) {
       lose();
     }
   }
+}
+
+function pickTwoDouble() {
+pickTwo(2);
+}
+function pickEightDouble() {
+  pickTwo(8);
+}
+function pickTwo(guess) {
+  const numbers = [];
+  while (numbers.length < 10) {
+    numbers.push(Math.floor(Math.random() * 11));
+  }
+  text.innerText = "You picked " + guess + ". Here are the random numbers:\n";
+  for (let i = 0; i < 10; i++) {
+    text.innerText += numbers[i] + "\n";
+  }
+  if (numbers.includes(guess)) {
+    text.innerText += "Right! You win 100 gold!";
+    gold += 100;
+    goldText.innerText = gold;
+    answer++;
+  } else {
+    answer++;
+    text.innerText += "Wrong! You lose 40 health!";
+    health -= 40;
+    healthText.innerText = health;
+    if (answer > 2) {
+      goTown();} 
+
+      else if (health <= 0) { //added issue with answer being able to be spammed so I now just let them do it twice no biggie. 
+      lose();
+    }
+  }
+  console.log(answer);
 }

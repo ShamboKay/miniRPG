@@ -37,9 +37,20 @@ body {
   }
   
   button {
+    margin: 1px; /* added some margin to stop the buttons from touching each other */
     cursor: pointer;
     color: #0a0a23;
     background-color: #feac32;
     background-image: linear-gradient(#fecc4c, #ffac33);
     border: 3px solid #feac32;
+  }
+  .imgBack { /* Need some images to show per section of death of creature, creature living, area: (cave, town, store, small dragon den, big dragon den,)
+    Then the lose screen and the winning screen
+    easter egg room also. */
+    display: flex;
+    justify-content: center;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
   }
