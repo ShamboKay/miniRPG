@@ -139,44 +139,25 @@ const img = document.createElement('img');
 img.src = imageSrc;
 imgBackDiv.appendChild(img);
 }
-
-function imgTown() {
-  setImage('Test image.png');
-}
-function  imgCave() {
-  setImage('');
-}
-function imgStore() {
-  setImage('');
-}
-function imgLose() {
-  setImage('');
-}
-function imgWin() {
-  setImage('');
-}
-function imgCreature() {
-  setImage('');
-}
-function imgCreatureDead() {
-  setImage('');
-}
-function imgEaster() {
-  setImage('');
+function updateImg(imageSrc) {
+  setImage(imageSrc);
 }
 
+function updateAndSetImage(location, imageSrc) {
+  update(location);
+  setImage(imageSrc);
+}
 
 function goTown() {
-  update(locations[0]);
-  imgTown();
+  updateAndSetImage(locations[0], 'TownImg.png');
 }
 
 function goStore() {
-  update(locations[1]); //Get from place to place
+  updateAndSetImage(locations[1], 'StoreImg.png');
 }
 
 function goCave() {
-  update(locations[2]);
+  updateAndSetImage(locations[2], 'CaveImg.png');
 }
 
 function buyHealth() {
@@ -185,9 +166,11 @@ function buyHealth() {
     health += 25;
     goldText.innerText = gold; //changed a few variables 
     healthText.innerText = health;
+    updateImg('HealthImg.png')
   } else {
     text.innerText = "You do not have enough gold to buy health.";
   }
+
 }
 
 function buyWeapon() {
@@ -200,6 +183,7 @@ function buyWeapon() {
       text.innerText = "You now have a " + newWeapon + ".";
       inventory.push(newWeapon);
       text.innerText += " In your inventory you have: " + inventory;
+      updateImg('WeaponImg.png');
     } else {
       text.innerText = "You do not have enough gold to buy a weapon.";
     } // added some text changed also 
@@ -229,6 +213,7 @@ function buyFireball() {
       goldText.innerText = gold;
       fireBall ++; //for the firescolls limit. 
       console.log(fireBall)
+      updateImg('FireballImg.png');
     }
 
   } else {
@@ -240,26 +225,31 @@ function buyFireball() {
 function fightSlime() { 
   fighting = 0;
   goFight();
+  updateImg('SlimeImg.png');
 }
 
 function fightGoblin() {
   fighting = 1;
   goFight();
+  updateImg('GoblinImg.png');
 }
 
 function fightBeast() {
   fighting = 2;
   goFight();
+  updateImg('BeastImg.png');
 }   //assigned to the right monsters and text and functions 
 
 function fightDragon() {
   fighting = 3;
   goFight();
+  updateImg('BabyDragonImg.png');
 }
 
 function fightMotherDragon() {
   fighting = 4;
   goFight();
+  updateImg('MotherDragon.png');
 }
 
 function goFight() {
@@ -276,8 +266,10 @@ function attack() {
   health -= getMonsterAttackValue(monsters[fighting].level);
   if (isMonsterHit()) {
     monsterHealth -= weapons[currentWeapon].power + Math.floor(Math.random() * xp) + 1;    
+    updateImg('AttackImg.png');
   } else {
     text.innerText += " You miss.";
+    updateImg('MissImg.png');
   }
   healthText.innerText = health;
   monsterHealthText.innerText = monsterHealth;
@@ -306,8 +298,10 @@ function castFireball() {
   if (isMonsterHit()) {
     monsterHealth -= 100;
     monsterHealthText.innerText = monsterHealth;
+    updateImg('FireBallImg.png');
   } else {
     text.innerText = "You missed."
+    updateImg('MissImg.png');
   }                                                                           //Made a whole new fucntion just to do 100dmg flat, nice. 
   
   if (health <= 0) {
@@ -348,14 +342,15 @@ function defeatMonster() {
   goldText.innerText = gold;
   xpText.innerText = xp;
   update(locations[4]);
+  imgCreatureDead;
 }
 
 function lose() {
-  update(locations[5]);
+  updateAndSetImage(locations[5], 'LoseImg.png');
 }
 
 function winGame() {
-  update(locations[6]);
+  updateAndSetImage(locations[6], 'WinImg.png');
 }
 
 function restart() {
@@ -380,7 +375,7 @@ function payToWin() {
 }
 
 function easterEgg() {
-  update(locations[7]);
+  updateAndSetImage(locations[7], 'EasterEggImg.png');
 }
 
 function pickTwo() {
@@ -448,5 +443,4 @@ function pickTwo(guess) {
       lose();
     }
   }
-  console.log(answer);
 }
